@@ -41,16 +41,16 @@ def calibrateDistorted(settings, points, image):
     numLowDistortionPoints = settings['minLowDistortionPoints']
     numHighDistortionPoints = settings['numHighDistortionPoints']
     passes = settings['passes']
-    
+
     points = pixelToSensor(points, resolution, pixelSize)
 
     # split the data into low/high distortion points
     points = sorted(points, key=lambda p: euclideanDistance2d(p.sensor))
     printVerbose('%d points' % len(points))
     lowDistortionPoints = points[:16]
-    printVerbose('%d low distortion points, max. distance from center of sensor = %fmm' % (len(lowDistortionPoints), np.max(map(lambda p: np.linalg.norm(p.sensor[:2]), lowDistortionPoints))))
+    printVerbose('%d low distortion points, max. distance from center of sensor = %fmm' % (len(lowDistortionPoints), np.max(list(map(lambda p: np.linalg.norm(p.sensor[:2]), lowDistortionPoints)))))
     highDistortionPoints = points[-numHighDistortionPoints:]
-    printVerbose('%d high distortion points, min. distance from center of sensor = %fmm' % (len(highDistortionPoints), np.min(map(lambda p: np.linalg.norm(p.sensor[:2]), highDistortionPoints))))
+    printVerbose('%d high distortion points, min. distance from center of sensor = %fmm' % (len(highDistortionPoints), np.min(list(map(lambda p: np.linalg.norm(p.sensor[:2]), highDistortionPoints)))))
 
     kappa = 0.0 # assume K1 = 0 (no distortion) for the initial calibration
 

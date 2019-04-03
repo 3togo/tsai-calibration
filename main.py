@@ -12,6 +12,7 @@ from __future__ import print_function
 import json
 import math
 from pprint import pprint
+import os
 
 # and some math stuff
 import numpy as np
@@ -43,11 +44,11 @@ def processStereo(leftCamera, rightCamera):
     print('\nCamera: %s' % leftCamera['label'])
     print('\n Left:')
     pprint(leftParams)
-    
+
 
     print('\n Right:')
     pprint(rightParams)
-    
+
     baseline = np.linalg.norm(leftParams['translationVector']-rightParams['translationVector'])
 
     print('\n baseline:')
@@ -64,6 +65,7 @@ def processStereo(leftCamera, rightCamera):
 
 
 def openFile(settings, folder):
+    print("openFile")
     dataFilename = '%s/config.json' % folder
 
     with open(dataFilename) as dataFile:
@@ -73,14 +75,18 @@ def openFile(settings, folder):
         settings[n] = data[n]
 
     def readCsvLine(csvLine):
-        values = map(lambda v: float(v), csvLine.split(','))
+        values = list(map(lambda v: float(v), csvLine.split(',')))
         return { 'left': newPoint({ 'world': values[:3], 'pixel': values[-4:-2] }), 'right': newPoint({ 'world': values[:3], 'pixel': values[-2:] }) }
 
     with open('%s/%s' % (folder, data['points'])) as csvFile:
-        points = map(readCsvLine, csvFile.readlines())
+        points = list(map(readCsvLine, csvFile.readlines()))
+    leftFname = '%s/%s' % (folder, data['images'][0])
+    print(leftFname)
+    leftImage = plt.imread(leftFname)
+    rightFname = '%s/%s' % (folder, data['images'][1])
+    print(rightFname)
+    rightImage = plt.imread(rightFname)
 
-    leftImage = plt.imread('%s/%s' % (folder, data['images'][0]))
-    rightImage = plt.imread('%s/%s' % (folder, data['images'][1]))
 
     leftPoints, rightPoints = map(lambda o: o['left'], points), map(lambda o: o['right'], points)
     leftCamera = calibrateDistorted(settings, leftPoints, leftImage)
@@ -91,7 +97,8 @@ def openFile(settings, folder):
 
 
 def openFolders(settings):
-    stats = map(lambda folder: openFile(settings, folder), settings['folders'])
+    print("openFolders")
+    stats = list(map(lambda folder: openFile(settings, folder), settings['folders']))
 
     with PdfPages(settings['outputFilename']) as pdf:
         def p(s, l):
@@ -102,9 +109,10 @@ def openFolders(settings):
             pdf.savefig(displayStereo(x))
             pdf.savefig(displayStereoSide(x))
         map(f, stats)
-        
+
 
 def main():
+    print("main")
     settings = {
         'camera': 'GoPro Hero 3+ Stereo',
         'yOffset': 0.0,
@@ -112,8 +120,8 @@ def main():
         'maxLowDistortionPoints': 18,
         'numHighDistortionPoints': 8,
         'passes': 8,
-        'folders': [ 'data/3d/shoot1' ],
-        'outputFilename': 'output/output.pdf'
+        'folders': [ os.path.join('data','3d', 'shoot1') ],
+        'outputFilename': os.path.join('output2','output.pdf')
     }
     openFolders(settings)
 

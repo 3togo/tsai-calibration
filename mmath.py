@@ -16,7 +16,7 @@ def euclideanDistance2d(x): #euclidean distance from x to (0,0)
 
 def matchingSigns(x, y): #returns true if x and y are both negative or both non-negative
     return (x < 0.0 and y < 0.0) or (x >= 0.0 and y >= 0.0)
-    
+
 
 def rotationToHomogeneous(r): #rotation matrix to homogeneous transformation
     q = np.transpose(np.array([r[0], r[1], r[2], np.zeros(3)], np.float64))
@@ -35,7 +35,8 @@ def matrixToEuler(M):
     return heading, attitude, bank
 
 
-def eulerToMatrix(( heading, attitude, bank )):
+def eulerToMatrix(E):
+    heading, attitude, bank = E
     # Convert euler angles back to matrix
     sa, ca = sin(attitude), cos(attitude)
     sb, cb = sin(bank), cos(bank)
