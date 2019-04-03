@@ -9,7 +9,6 @@
 from math import *
 import numpy as np
 
-
 def euclideanDistance2d(x): #euclidean distance from x to (0,0)
     return sqrt((x[0]*x[0]) + (x[1]*x[1]))
 

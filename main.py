@@ -13,6 +13,7 @@ import json
 import math
 from pprint import pprint
 import os
+jmap=lambda x,y: list(map(x,y))
 
 # and some math stuff
 import numpy as np
@@ -37,7 +38,7 @@ from plot import *
 
 
 def processStereo(leftCamera, rightCamera):
-    worldPoints = map(lambda p: p.world, leftCamera['points'])
+    worldPoints = jmap(lambda p: p.world, leftCamera['points'])
     leftParams = leftCamera['params']
     rightParams = rightCamera['params']
 
@@ -75,11 +76,11 @@ def openFile(settings, folder):
         settings[n] = data[n]
 
     def readCsvLine(csvLine):
-        values = list(map(lambda v: float(v), csvLine.split(',')))
+        values = jmap(lambda v: float(v), csvLine.split(','))
         return { 'left': newPoint({ 'world': values[:3], 'pixel': values[-4:-2] }), 'right': newPoint({ 'world': values[:3], 'pixel': values[-2:] }) }
 
     with open('%s/%s' % (folder, data['points'])) as csvFile:
-        points = list(map(readCsvLine, csvFile.readlines()))
+        points = jmap(readCsvLine, csvFile.readlines())
     leftFname = '%s/%s' % (folder, data['images'][0])
     print(leftFname)
     leftImage = plt.imread(leftFname)
@@ -88,7 +89,7 @@ def openFile(settings, folder):
     rightImage = plt.imread(rightFname)
 
 
-    leftPoints, rightPoints = map(lambda o: o['left'], points), map(lambda o: o['right'], points)
+    leftPoints, rightPoints = jmap(lambda o: o['left'], points), jmap(lambda o: o['right'], points)
     leftCamera = calibrateDistorted(settings, leftPoints, leftImage)
     rightCamera = calibrateDistorted(settings, rightPoints, rightImage)
     world = processStereo(leftCamera, rightCamera)
@@ -98,7 +99,7 @@ def openFile(settings, folder):
 
 def openFolders(settings):
     print("openFolders")
-    stats = list(map(lambda folder: openFile(settings, folder), settings['folders']))
+    stats = jmap(lambda folder: openFile(settings, folder), settings['folders'])
 
     with PdfPages(settings['outputFilename']) as pdf:
         def p(s, l):

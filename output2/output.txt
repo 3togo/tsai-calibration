@@ -1,0 +1,4 @@
+main
+openFolders
+openFile
+data\3d\shoot1/3D_L0933_square.JPG

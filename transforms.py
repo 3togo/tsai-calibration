@@ -9,7 +9,7 @@
 import math
 import numpy as np
 from mmath import *
-
+jmap=lambda x,y: list(map(x,y))
 ### Transform from world coordinates to pixel coordinates
 
 
@@ -19,7 +19,7 @@ def worldToCamera(points, params, yOffset):
 
     def transform(point):
         return point._replace(camera = np.dot(worldToCamera, [ point.world[0], point.world[1], point.world[2], 1 ]))
-    return map(transform, points)
+    return jmap(transform, points)
 
 
 # 3d camera coordinates (in mm) -> sensor coordinates (2d, in mm)
@@ -35,7 +35,7 @@ def projectPoints(points, f):
         # p is now a 2d vector from the center of the image sensor, in mm
         return point._replace(projectedSensor = p)
 
-    return map(projectPoint, points)
+    return jmap(projectPoint, points)
 
 
 # sensor coordinates (2d, in mm) -> normalised image coordinates
@@ -45,7 +45,7 @@ def sensorToNormal(points, pixelSize, resolution):
     def transform(point):
         p = [ point.projectedSensor[0], point.projectedSensor[1], 1.0 ]
         return point._replace(projectedNormal = np.dot(s2n, p))
-    return map(transform, points)
+    return jmap(transform, points)
 
 
 # normalised image coordinates -> distorted normalised image coordinates
@@ -62,7 +62,7 @@ def distortPoints(points, kappa):
 
     def transform(point):
         return point._replace(distortedNormal = dist(point.projectedNormal))
-    return map(transform, points)
+    return jmap(transform, points)
 
 
 # (distorted) normalised image coordinates -> pixels
@@ -73,7 +73,7 @@ def normalToPixel(points, resolution):
         p = [ point.projectedNormal[0], point.projectedNormal[1], 1.0 ]
         d = [ point.distortedNormal[0], point.distortedNormal[1], 1.0 ]
         return point._replace(projectedPixel = np.dot(n2p, p), distortedPixel = np.dot(n2p, d))
-    return map(transform, points)
+    return jmap(transform, points)
 
 
 
@@ -88,7 +88,7 @@ def pixelToNormal(points, resolution):
     def transform(point):
         p = np.array([ point.pixel[0], point.pixel[1], 1.0 ], np.float64)  #pixel coordinates to homogeneous
         return point._replace(normal = np.dot(p2n, p)) # =  [ xd, yd, 1.0 ]  transform pixel coordinates to sensor coordinates (in mm, origin at center of camera)
-    return map(transform, points)
+    return jmap(transform, points)
 
 
 # normalised image coordinates -> undistorted normalised image coordinates
@@ -97,7 +97,7 @@ def undistortPoints(points, kappa):
         x, y = point.normal[0], point.normal[1]
         correction = 1.0 - ( kappa * ( (x*x) + (y*y) ) )
         return point._replace(normal = np.multiply(point.normal, [ correction, correction, 1.0 ]))
-    return map(transform, points)
+    return jmap(transform, points)
 
 
 # normalised image coordinates -> sensor coordinates (2d, in mm)
@@ -108,7 +108,7 @@ def normalToSensor(points, resolution, pixelSize):
     def transform(point):
         p = np.array([ point.normal[0], point.normal[1], 1.0 ], np.float64)  #pixel coordinates to homogeneous
         return point._replace(sensor = np.dot(n2s, p)) # =  [ xd, yd, 1.0 ]  transform pixel coordinates to sensor coordinates (in mm, origin at center of camera)
-    return map(transform, points)
+    return jmap(transform, points)
 
 
 

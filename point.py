@@ -7,11 +7,11 @@
 ###
 
 from collections import namedtuple
-
+jmap=lambda x,y: list(map(x,y))
 #we're going to be using points a lot, so a namedtuple should give better performance than a hashmap
 def makePointClass():
     pointSchema = [ 'world', 'camera', 'pixel', 'projectedPixel', 'distortedPixel', 'sensor', 'projectedSensor', 'distortedSensor', 'normal', 'projectedNormal', 'distortedNormal' ]
     Point = namedtuple('Point', pointSchema)
-    defaultPoint = Point(*map(lambda x: None, range(len(pointSchema))))
+    defaultPoint = Point(*jmap(lambda x: None, range(len(pointSchema))))
     return Point, lambda dict: defaultPoint._replace(**dict)
 Point, newPoint = makePointClass()

@@ -14,14 +14,14 @@ import numpy as np
 import scipy as sp
 from transforms import *
 from calibration import calibrate
-
+jmap=lambda x,y: list(map(x,y))
 
 verbose = False
 printVerbose = print if verbose else lambda *a, **k: None   # http://stackoverflow.com/questions/5980042/how-to-implement-the-verbose-or-v-option-into-a-script
 
 
 def error(points):
-    numbers = map(lambda p: np.linalg.norm(np.subtract(p.pixel[:2], p.distortedPixel[:2])), points)
+    numbers = jmap(lambda p: np.linalg.norm(np.subtract(p.pixel[:2], p.distortedPixel[:2])), points)
     return { 'mean': np.mean(numbers), 'median': np.median(numbers), 'min': np.amin(numbers), 'max': np.amax(numbers) }
 
 
@@ -31,7 +31,7 @@ def estimateKappa(points):
         d2 = (point.sensor[0]*point.sensor[0]) + (point.sensor[1]*point.sensor[1])
         d = math.sqrt(d2)
         return (u2-d2)/(d2*d)
-    return -np.mean(map(estimateKappaP, points))
+    return -np.mean(jmap(estimateKappaP, points))
 
 def calibrateDistorted(settings, points, image):
     pixelSize = settings['pixelSize']
@@ -48,9 +48,9 @@ def calibrateDistorted(settings, points, image):
     points = sorted(points, key=lambda p: euclideanDistance2d(p.sensor))
     printVerbose('%d points' % len(points))
     lowDistortionPoints = points[:16]
-    printVerbose('%d low distortion points, max. distance from center of sensor = %fmm' % (len(lowDistortionPoints), np.max(list(map(lambda p: np.linalg.norm(p.sensor[:2]), lowDistortionPoints)))))
+    printVerbose('%d low distortion points, max. distance from center of sensor = %fmm' % (len(lowDistortionPoints), np.max(jmap(lambda p: np.linalg.norm(p.sensor[:2]), lowDistortionPoints))))
     highDistortionPoints = points[-numHighDistortionPoints:]
-    printVerbose('%d high distortion points, min. distance from center of sensor = %fmm' % (len(highDistortionPoints), np.min(list(map(lambda p: np.linalg.norm(p.sensor[:2]), highDistortionPoints)))))
+    printVerbose('%d high distortion points, min. distance from center of sensor = %fmm' % (len(highDistortionPoints), np.min(jmap(lambda p: np.linalg.norm(p.sensor[:2]), highDistortionPoints))))
 
     kappa = 0.0 # assume K1 = 0 (no distortion) for the initial calibration
 
